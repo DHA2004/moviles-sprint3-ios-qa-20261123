@@ -41,6 +41,7 @@ jobs:
           git -C "$RUNNER_TEMP/flutter" remote add origin https://github.com/flutter/flutter.git
           git -C "$RUNNER_TEMP/flutter" fetch --depth=1 origin 9584c6713b324636289d067944a46fd6b49df14b
           git -C "$RUNNER_TEMP/flutter" checkout --detach FETCH_HEAD
+          git -C "$RUNNER_TEMP/flutter" tag 3.47.4 9584c6713b324636289d067944a46fd6b49df14b
           echo "$RUNNER_TEMP/flutter/bin" >> "$GITHUB_PATH"
       - name: Record the build environment
         shell: bash
