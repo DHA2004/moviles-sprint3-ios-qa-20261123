@@ -62,11 +62,13 @@ jobs:
         run: |
           set -euo pipefail
           flutter pub get --enforce-lockfile
-          flutter build ios --simulator --debug --no-codesign
+          flutter build ios --simulator --debug
           destination="$GITHUB_WORKSPACE/outputs/Team$TEAM"
           mkdir -p "$destination"
           app_bundle="$(find build/ios/iphonesimulator -maxdepth 1 -type d -name '*.app' -print -quit)"
           test -n "$app_bundle"
+          codesign --verify --deep --strict "$app_bundle"
+          codesign -d --entitlements - "$app_bundle" > "$destination/SIMULATOR_ENTITLEMENTS.plist"
           ditto -c -k --sequesterRsrc --keepParent "$app_bundle" "$destination/Team${TEAM}_Sprint3_iOS_Simulator.zip"
           shasum -a 256 "$destination/Team${TEAM}_Sprint3_iOS_Simulator.zip" > "$destination/SHA256.txt"
           {
@@ -75,6 +77,7 @@ jobs:
             echo "Flutter commit: 9584c6713b324636289d067944a46fd6b49df14b (3.47.4)"
             echo "No original repository or source file intentionally modified."
             echo "Rebuilt simulator app; not the original signed device binary."
+            echo "Default Xcode simulator signing retained; no developer certificate supplied."
             echo "No physical iPhone validation is established by this build."
           } > "$destination/BUILD_PROVENANCE.txt"
       - name: Keep simulator app for private test-session upload
